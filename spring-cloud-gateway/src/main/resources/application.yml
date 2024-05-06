@@ -1,0 +1,46 @@
+# this app work to be spring cloud Gateway
+# If your config not working just bring it on the top line
+# Meaning you can not access
+# It worked !!! (Order importance)
+###### set up for spring cloud (config route path)
+spring:
+  cloud:
+    gateway:
+      routes:
+      ##### Look at your log when you requested , Will see http.uri='http://localhost:8080/api/customer/reads'
+      ##### Now you know  predicates : - Path=</> , filters : - PrefixPath=</>
+      ##### It will map your real path of microservice
+      ##### You can not make path name for accessing it Ok! As predicates : - Path=/customer-demo/** , filters : - PrefixPath=/api
+      ##### That result is http://localhost:8080/api/customer-demo/reads it does not exist Clear
+        - id: customer
+          # crud list collection
+          uri: http://localhost:8081
+          #
+          # First way you can call http://localhost:8080/api/customer/**
+          #
+          # predicates:
+            # - Path=/api/customer/**
+          # filters:
+            # - PrefixPath=/api
+          ###### How difference !!!!
+          #
+          # Second way you can call http://localhost:8080/customer/**
+          #
+          predicates:
+           - Path=/customer/**
+          filters:
+           - PrefixPath=/api
+        ###############################################################################################
+        - id: robot
+          # crud h2 database
+          uri: http://localhost:8082
+          predicates:
+            - Path=/robot/**
+  application:
+    name: spring-cloud-gateway
+logging:
+  level:
+    root: info
+# set up port that gateway run
+server:
+  port: 8888
